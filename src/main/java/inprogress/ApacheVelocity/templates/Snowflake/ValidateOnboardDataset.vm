@@ -1,0 +1,1 @@
+describe view $incoming_partner_cleanroom_db_name.$partner_cleanroom_schema_name.$secure_view_name;

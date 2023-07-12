@@ -1,0 +1,256 @@
+#set($elements = $params)
+#parse("/SnowFlake/Roles&Warehouse.vm")
+USE DATABASE $db;
+CREATE SCHEMA IF NOT EXISTS $db.$schema;
+
+package com.walmart.mat.dcr.service.temp.question;
+
+import com.walmart.mat.dcr.service.temp.common.enums.CleanroomState;
+import com.walmart.mat.dcr.service.temp.common.enums.CleanroomType;
+import com.walmart.mat.dcr.service.temp.common.util.SnowflakeUtility;
+import com.walmart.mat.dcr.service.temp.dto.CleanroomResponse;
+import com.walmart.mat.dcr.service.temp.dto.CreateCleanroomRequest;
+import com.walmart.mat.dcr.service.temp.dto.Response;
+import com.walmart.mat.dcr.service.temp.dto.ViewProvisionedQuestion;
+import com.walmart.mat.dcr.service.temp.dto.platform.CreateCollaborationDto;
+import com.walmart.mat.dcr.service.temp.dto.questions.*;
+import com.walmart.mat.dcr.service.temp.exceptions.CollaborationException;
+import com.walmart.mat.dcr.service.temp.models.Cleanroom;
+import com.walmart.mat.dcr.service.temp.models.CleanroomPartner;
+import com.walmart.mat.dcr.service.temp.models.Organisation;
+import com.walmart.mat.dcr.service.temp.models.question.*;
+import com.walmart.mat.dcr.service.temp.repositories.CleanroomRepository;
+import com.walmart.mat.dcr.service.temp.repositories.organisation.OrganisationRepository;
+import com.walmart.mat.dcr.service.temp.repositories.question.*;
+import com.walmart.mat.dcr.service.temp.services.impl.CleanroomServiceImpl;
+import com.walmart.mat.dcr.service.temp.services.impl.QuestionServiceImpl;
+import org.apache.http.HttpStatus;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import javax.xml.crypto.Data;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+
+import static org.mockito.Mockito.when;
+@RunWith(MockitoJUnitRunner.class)
+public class QuestionServiceImplTest {
+
+    @InjectMocks
+    QuestionServiceImpl questionService;
+
+    @Mock
+    QuestionRepository questionRepository;
+    @Mock
+    OrganisationRepository organisationRepository;
+    @Mock
+    private DatasetMacroRepository datasetMacroRepository;
+    @Mock
+    ColumnMacroRepository columnMacroRepository;
+    @Mock
+    QueryTemplateRepository queryTemplateRepository;
+
+    @Mock
+    CleanroomRepository cleanroomRepository;
+
+    @Mock
+    QuestionInstanceRepository questionInstanceRepository;
+
+    /**
+     * Test to create question
+     * expected : successfully create a question template in metadata db
+     */
+    @Test
+    public void testCreateQuestion() {
+        List<CreateQueryTemplateDTO> queryTemplatesDto = List.of(CreateQueryTemplateDTO.builder()
+                .queryTemplate("select * from question")
+                .order(1).build());
+        CreateQuestionRequestDto createQuestionRequest = CreateQuestionRequestDto.builder().questionDescription("question_description")
+                .questionType("LIST")
+                .questionName("question_name")
+                .platformType("SNOWFLAKE")
+                .createdBy(123)
+                .queryTemplates(queryTemplatesDto)
+                .macros(List.of(CreateMacroDTO.builder().name("@trn_id").description("transaction id")
+                        .columnMacros(List.of(CreateColumnMacroDTO.builder().columnUsage("test_column_usage")
+                                .dataType("varchar").description("column used in macro mapping").name("trans_id").build())).build())).build();
+        Organisation organisation = Organisation.builder().id(1).orgName("walmart_org").build();
+        //when(organisationRepository.getById(Mockito.anyInt())).thenReturn(organisation);
+        Question question = Question.builder().questionName("analytical_question").questionDescription("analytical_qstn_desc")
+                .questionStatus(QuestionStatus.PUBLISHED)
+                .questionType(QuestionType.LIST)
+                .organisation(organisation).build();
+        when(questionRepository.save(Mockito.any())).thenReturn(question);
+        List<QueryTemplate> queryTemplates = List.of(QueryTemplate.builder().templateOrder(1)
+                .template("select * from question").question(question).build());
+
+        DatasetMacro datasetMacro = DatasetMacro.builder()
+                .description("dataset_macros")
+                .name("macro_name").question(question).build();
+        when(queryTemplateRepository.saveAll(Mockito.any())).thenReturn(queryTemplates);
+        when(datasetMacroRepository.save(Mockito.any())).thenReturn(datasetMacro);
+        List<ColumnMacro> columnMacros = List.of(ColumnMacro.builder()
+                .datasetMacro(datasetMacro)
+                .columnType("macro_column_type")
+                .columnUsage("column_usage")
+                .description("column macro description").build());
+        when(columnMacroRepository.saveAll(Mockito.any())).thenReturn(columnMacros);
+        //platformService = CommonUtils.getPlatform(1);
+        Response questionResponse = Response.builder().statusCode(HttpStatus.SC_CREATED).message("Question Created successfully")
+                .build();
+        Response response = questionService.createQuestion(createQuestionRequest);
+        Assert.assertEquals(questionResponse, response);
+    }
+
+    /**
+     * Test to fetch all questions part of an org
+     * expected : successfully fetch all questions part of an org from  metadata db
+     */
+
+    @Test
+    public void testGetQuestions() {
+        List<QuestionDetailsResponseDTO> questionDetailsResponse = List.of(QuestionDetailsResponseDTO.builder().orgId(1)
+                .questionName("analytical_question").questionType("LIST")
+                .questionDescription("analytical_qstn_desc")
+                .platformType("SNOWFLAKE").build());
+        Organisation organisation = Organisation.builder().id(1).orgName("walmart_org").build();
+        when(organisationRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(organisation));
+        Question question = Question.builder().questionName("analytical_question").questionDescription("analytical_qstn_desc")
+                .questionStatus(QuestionStatus.PUBLISHED)
+                .questionType(QuestionType.LIST)
+                .organisation(organisation).build();
+        when(questionRepository.findByOrganisation(Mockito.any())).thenReturn(List.of(question));
+
+        List<QueryTemplate> queryTemplates = List.of(QueryTemplate.builder().templateOrder(1)
+                .template("select * from question").question(question).build());
+        DatasetMacro datasetMacro = DatasetMacro.builder()
+                .description("dataset_macros")
+                .name("macro_name").question(question).build();
+        when(queryTemplateRepository.findByQuestion(Mockito.any())).thenReturn(queryTemplates);
+        when(datasetMacroRepository.findByQuestion(Mockito.any())).thenReturn(List.of(datasetMacro));
+        List<ColumnMacro> columnMacros = List.of(ColumnMacro.builder()
+                .datasetMacro(datasetMacro)
+                .columnType("macro_column_type")
+                .columnUsage("column_usage")
+                .description("column macro description").build());
+        when(columnMacroRepository.findByDatasetMacro(Mockito.any())).thenReturn(columnMacros);
+        //platformService = CommonUtils.getPlatform(1);
+        Response questionResponse = Response.builder().body(questionDetailsResponse).statusCode(HttpStatus.SC_CREATED)
+                .message("Fetch Organisation questions successfully")
+                .build();
+        Cleanroom cleanroom = Cleanroom.builder()
+                .id(1)
+                .cleanroomName("first_clean_room")
+                .description("made my mockito")
+                .organisationId(1)
+                .platformId(1)
+                .cleanroomType(CleanroomType.LIST)
+                .datasetConfigured(false)
+                .cleanroomState(CleanroomState.INITIATED)
+                .partnersAllowed(1)
+                .build();
+        when(cleanroomRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(cleanroom));
+        QuestionInstance questionInstance = QuestionInstance.builder()
+                .question(question)
+                .cleanroom(cleanroom)
+                .status(String.valueOf(QuestionInstanceStatus.CREATED))
+                .build();
+        when(questionInstanceRepository.save(Mockito.any())).thenReturn(questionInstance);
+        ViewProvisionedQuestion viewProvisionedQuestion = ViewProvisionedQuestion
+                .builder()
+                .provisionedQuestion(questionInstance)
+                .build();
+        Response response = questionService.getQuestions(viewProvisionedQuestion);
+        Assert.assertEquals(questionResponse.getMessage(), response.getMessage());
+    }
+
+/*
+* INSERT INTO dcr.cleanroom (
+  `cleanroom_name`,
+  `description`,
+  `organisation_id`,
+  `platform_id`,
+  `cleanroom_type`,
+  `dataset_configured`,
+  `cleanroom_state`,
+  `partners_allowed`,
+  `created_at`,
+  `updated_at`)
+VALUES
+(
+	'first_clean_room',
+	'made from Dbeaver by Soumyadeep Mukhopadhyay',
+	2,
+	1,
+	'LIST',
+	0,
+	'INITIATED',
+	2,
+	CURRENT_TIMESTAMP(),
+	NULL
+)*/
+    @Test
+    public void testProvisionQuestions() {
+        Organisation organisation = Organisation.builder().id(1).orgName("walmart_org").build();
+        when(organisationRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(organisation));
+        Question question = Question.builder()
+                .id(1)
+                .questionName("analytical_question")
+                .questionDescription("analytical_qstn_desc")
+                .questionStatus(QuestionStatus.PUBLISHED)
+                .questionType(QuestionType.LIST)
+                .platform(QuestionPlatform.SNOWFLAKE)
+                .createdBy(1)
+                .organisation(organisation)
+                .build();
+        when(questionRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(question));
+        Cleanroom cleanroom = Cleanroom.builder()
+                .id(1)
+                .cleanroomName("first_clean_room")
+                .description("made my mockito")
+                .organisationId(1)
+                .platformId(1)
+                .cleanroomType(CleanroomType.LIST)
+                .datasetConfigured(false)
+                .cleanroomState(CleanroomState.INITIATED)
+                .partnersAllowed(1)
+                .build();
+        when(cleanroomRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(cleanroom));
+        QuestionInstance questionInstance = QuestionInstance.builder()
+                .question(question)
+                .cleanroom(cleanroom)
+                .status(String.valueOf(QuestionInstanceStatus.CREATED))
+                .build();
+        when(questionInstanceRepository.save(Mockito.any())).thenReturn(questionInstance);
+        ProvisionQuestionResponseBodyDTO responseBodyDTO = ProvisionQuestionResponseBodyDTO.builder()
+                .cleanrooms(List.of(ProvisionQuestionCleanromDetails.builder()
+                                .id(cleanroom.getId())
+                                .name(cleanroom.getCleanroomName())
+                                .build()))
+                .questionId(question.getId())
+                .questionName(questionRepository.findById(Mockito.anyInt()).get().getQuestionName())
+                .build();
+        Response mockedResponse = Response.builder()
+                .body(responseBodyDTO)
+                .statusCode(HttpStatus.SC_CREATED)
+                .message("Question Provisioned successfully inside a cleanroom")
+                .build();
+        ProvisionQuestionRequestDTO provisionQuestion = ProvisionQuestionRequestDTO.builder()
+                .cleanrooms(List.of(cleanroom))
+                .orgId(1)
+                .questionId(1)
+                .build();
+        Response provisionQuestionResponse = questionService.provisionQuestions(provisionQuestion);
+        Assert.assertEquals(mockedResponse.getMessage(), provisionQuestionResponse.getMessage());
+
+    }
+}

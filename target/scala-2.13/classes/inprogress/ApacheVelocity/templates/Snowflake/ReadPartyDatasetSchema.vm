@@ -1,0 +1,1 @@
+DESCRIBE TABLE $source_db.$source_schema.$source_tbl;

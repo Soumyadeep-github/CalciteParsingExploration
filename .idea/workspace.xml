@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0adef2cb-1c20-4f9f-b95f-8b011f8f5ab3" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="SBT">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Calcite-Exploration-fresh" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="mmp2sggr" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectId" id="2Q71b7esHco35g7TqhOFzvDewiy" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "OverrideImplement.generate.javadoc": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "/Users/s0m0shx/Documents/JavaProjects/TestingTemplateEnginesAndMisc",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/inprogress/ApacheVelocity/templates/Snowflake/commonQueries" />
+      <recent name="$PROJECT_DIR$/src/main/java/inprogress/ApacheVelocity/templates" />
+      <recent name="$PROJECT_DIR$/src/main/scala" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/inprogress/ApacheVelocity/templates/Snowflake" />
+      <recent name="$PROJECT_DIR$/src/main/java/inprogress/ApacheVelocity" />
+      <recent name="$PROJECT_DIR$/src/main/java" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="inprogress.templatesAndCode" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="inprogress" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.GenerateSqlNodes">
+    <configuration name="GenerateSqlNodes" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="inprogress.ApacheCalcite.supportingClasses.GenerateSqlNodes" />
+      <module name="Calcite-Exploration-fresh" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="inprogress.ApacheCalcite.supportingClasses.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RelShuttleBruteForce" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="succeeded.RelShuttleBruteForce" />
+      <module name="Calcite-Exploration-fresh" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="succeeded.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RenderTemplates" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="inprogress.ApacheVelocity.dcrTemplates.RenderTemplates" />
+      <module name="Calcite-Exploration-fresh" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="inprogress.ApacheVelocity.dcrTemplates.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ReplaceMacros" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="inprogress.ApacheCalcite.ReplaceMacros" />
+      <module name="Calcite-Exploration-fresh" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="inprogress.ApacheCalcite.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SqlFromTemplates" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="succeeded.SqlFromTemplates" />
+      <module name="Calcite-Exploration-fresh" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="succeeded.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.GenerateSqlNodes" />
+        <item itemvalue="Application.ReplaceMacros" />
+        <item itemvalue="Application.RelShuttleBruteForce" />
+        <item itemvalue="Application.RenderTemplates" />
+        <item itemvalue="Application.SqlFromTemplates" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0adef2cb-1c20-4f9f-b95f-8b011f8f5ab3" name="Changes" comment="" />
+      <created>1684689876674</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1684689876674</updated>
+    </task>
+    <servers />
+  </component>
+</project>

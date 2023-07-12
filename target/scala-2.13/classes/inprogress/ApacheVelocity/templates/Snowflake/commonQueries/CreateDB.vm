@@ -1,0 +1,4 @@
+#set($elements = $params)
+#parse("/SnowFlake/Roles&Warehouse.vm")
+
+CREATE DATABASE IF NOT EXISTS $db;

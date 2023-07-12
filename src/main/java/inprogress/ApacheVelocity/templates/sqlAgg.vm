@@ -1,0 +1,32 @@
+#define($concatArr)
+ #set ($h = "")
+ #set ($count = 0)
+ #foreach($ele in $arr)
+    #if($count < ($arr.size() - 1))
+        #set ($h = "${ele}, ${h}")
+        #set ($count = $count + 1)
+    #elseif ($count == ($arr.size() - 1))
+        #set ($h = "${h}${ele}")
+    #end
+ #end
+$h#end
+
+#set ($arr = $myArray)
+
+
+SELECT
+#if ($agg.size() > 0)
+    #foreach ($i in $agg)
+        #set ($ij = $i.split(":"))
+    $concatArr, $ij[0]($ij[1])
+    #end
+#else
+    $concatArr
+#end
+FROM $tblName
+#if ($agg.size() > 0)
+GROUP BY
+    $concatArr;
+#else
+;
+#end

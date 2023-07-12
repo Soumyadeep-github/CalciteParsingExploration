@@ -1,0 +1,6 @@
+#foreach($db_sch in $dbs_schemas)
+#set ($j = $db_sch.split("\."))
+GRANT USAGE ON DATABASE $j[0] TO ROLE $role_name;
+GRANT USAGE ON SCHEMA $db_sch TO ROLE $role_name;
+GRANT SELECT ON ALL TABLES IN SCHEMA $db_sch TO ROLE $role_name;
+#end

@@ -1,0 +1,10 @@
+-- SCRIPT IS RUNNING ON WALMART'S ACCOUNT
+-- use basic roles
+#set($elements = ["NONE", "compute_wh"])
+#parse("/SnowFlake/commonQueries/Roles&Warehouse.vm")
+
+
+-- mounting db
+create or replace database $incoming_partner_cleanroom_db_name
+    from share $partner_account_id.$incoming_partner_cleanroom_share_name;
+-- describe share $partner_account_id.$incoming_partner_cleanroom_share_name;

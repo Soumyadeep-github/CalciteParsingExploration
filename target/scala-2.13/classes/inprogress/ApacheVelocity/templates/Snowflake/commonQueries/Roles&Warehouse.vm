@@ -1,0 +1,9 @@
+#set($role=$elements.get(0))
+#set($warehouse_name=$elements.get(1))
+#if ($elements.get(0) != "NONE")
+USE ROLE #evaluate($role);
+##evaluate("USE ROLE"$role);
+#end
+#if ($elements.get(1) != "NONE")
+USE WAREHOUSE $warehouse_name;
+#end

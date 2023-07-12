@@ -1,0 +1,21 @@
+-- SCRIPT IS RUNNING ON FLAPCHAT'S ACCOUNT
+-- use custom roles
+#set($elements = ["accountadmin", "compute_wh"])
+#parse("/SnowFlake/commonQueries/Roles&Warehouse.vm")
+
+GRANT REFERENCE_USAGE ON DATABASE $source_db_name TO SHARE $partner_cleanroom_share_name;
+
+#set($elements = [$partner_role, "NONE"])
+#parse("/SnowFlake/commonQueries/Roles&Warehouse.vm")
+
+-- set up db elements that need to be added to share
+-- CREATE DATABASE IF NOT EXISTS $destination_db_name;
+CREATE SCHEMA IF NOT EXISTS $destination_db_name.$destination_schema_name;
+CREATE OR REPLACE SECURE VIEW $destination_db_name.$destination_schema_name.$secure_view_name
+    AS SELECT * FROM $source_db_name.$source_schema_name.$source_table_name;
+
+-- add secure views to share
+GRANT SELECT ON $destination_db_name.$destination_schema_name.$secure_view_name
+    TO SHARE $partner_cleanroom_share_name;
+
+

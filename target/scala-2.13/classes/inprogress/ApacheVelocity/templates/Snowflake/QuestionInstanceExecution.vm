@@ -1,0 +1,33 @@
+-- SCRIPT IS RUNNING ON WALMART'S ACCOUNT
+-- use custom roles
+#set($elements = [$role_name, $customWarehouse])
+#parse("/SnowFlake/commonQueries/Roles&Warehouse.vm")
+
+CREATE DATABASE IF NOT EXISTS $workflow_db;
+CREATE SCHEMA IF NOT EXISTS $workflow_db.$workflow_schema;
+
+EXECUTE IMMEDIATE $$
+DECLARE
+    db_exists boolean DEFAULT (select to_boolean(count(1))
+                               from information_schema.databases
+                               where database_name = '$workflow_db');
+    schema_exists boolean;
+    result RESULTSET;
+BEGIN
+    IF (db_exists) THEN
+        USE DATABASE JOBS;
+        schema_exists := (select to_boolean(count(1))
+                          from information_schema.schemata
+                          where schema_name = '$workflow_schema');
+        IF (schema_exists) THEN
+            CREATE OR REPLACE VIEW $workflow_db.$workflow_db.$job_view
+                AS ($question_instance);
+            result := (SELECT * FROM $job_view);
+            RETURN TABLE(result);
+        ELSE
+            RETURN 'SCHEMA does not exist';
+        END IF;
+    ELSE
+        RETURN 'DATABASE does not exist';
+    END IF;
+END;$$;

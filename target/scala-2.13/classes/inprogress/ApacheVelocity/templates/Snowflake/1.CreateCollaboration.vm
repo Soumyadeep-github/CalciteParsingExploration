@@ -1,0 +1,14 @@
+-- SCRIPT IS RUNNING ON WALMART'S ACCOUNT
+-- use basic roles
+#set($elements = ["accountadmin", "compute_wh"])
+#parse("/SnowFlake/commonQueries/Roles&Warehouse.vm")
+
+-- create role
+-- TODO: rolename should be hardcoded or coming from collaboration service?
+#set($createRoleParams = [$owner_role, $db_schemas_tables])
+#parse("/SnowFlake/commonQueries/CreateRoleOwner.vm")
+
+-- create warehouse
+#set($params = [$owner_role, $customWarehouse])
+#parse("/SnowFlake/commonQueries/CreateWarehouse.vm")
+

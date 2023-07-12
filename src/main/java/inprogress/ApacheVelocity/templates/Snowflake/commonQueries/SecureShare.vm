@@ -1,0 +1,11 @@
+#set($elements = $params)
+#parse("/SnowFlake/Roles&Warehouse.vm")
+
+CREATE SHARE IF NOT EXISTS $shareName COMMENT = "${customMetadata}";
+GRANT USAGE ON DATABASE $dbName TO SHARE $shareName;
+ALTER SHARE IF EXISTS $shareName ADD ACCOUNTS = $accountNames.stream().collect($collectorFunc);
+-- split this flow into 2
+
+GRANT USAGE ON DATABASE $dbName TO SHARE $shareName;
+GRANT USAGE ON SCHEMA $dbName.$schemaName TO SHARE $shareName;
+GRANT SELECT ON $dbName.$schemaName.$datasetName TO SHARE $shareName;

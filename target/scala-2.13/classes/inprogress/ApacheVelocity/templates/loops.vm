@@ -1,0 +1,31 @@
+#set ($myArray = ["one", "two", "three", "4", "5"])
+
+#foreach($item in $myArray)
+List Item: $item
+#end
+
+#foreach($number in [1..5])
+        Current Index: $number
+#end
+
+Products prices
+
+#foreach($p in $products)
+    Name: $p.name  Price: $p.price
+#end
+
+#define($block)
+#set ($h = "")
+#set ($count = 0)
+#foreach($ele in $arr)
+#if($count < ($arr.size() - 1))
+a $ele
+#set ($h = "${ele},${h}")
+#set ($count = $count + 1)
+#elseif ($count == ($arr.size() - 1))
+b $ele
+#set ($h = "${h}${ele}")
+#end
+#end $h #end
+#set ($arr = $myArray)
+$block

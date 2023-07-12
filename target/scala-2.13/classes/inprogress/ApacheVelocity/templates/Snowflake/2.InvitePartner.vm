@@ -1,0 +1,24 @@
+-- SCRIPT IS RUNNING ON FLAPCHAT'S ACCOUNT
+-- use basic roles
+#set($elements = ["accountadmin", "compute_wh"])
+#parse("/SnowFlake/commonQueries/Roles&Warehouse.vm")
+
+-- create role
+#set($createRoleParams = [$partner_role, $db_schemas_tables])
+#parse("/SnowFlake/commonQueries/CreateRolePartner.vm")
+
+-- use custom roles
+#set($elements = [$partner_role, "NONE"])
+#parse("/SnowFlake/commonQueries/Roles&Warehouse.vm")
+
+-- create database and schema
+create database if not exists $partner_cleanroom_db_name;
+create schema if not exists $partner_cleanroom_db_name.$partner_cleanroom_schema_name;
+
+-- create share
+CREATE OR REPLACE SHARE $partner_cleanroom_share_name;
+
+-- add owner to the partner share
+grant usage on database $partner_cleanroom_db_name to share $partner_cleanroom_share_name;
+grant usage on schema $partner_cleanroom_db_name.$partner_cleanroom_schema_name to share $partner_cleanroom_share_name;
+alter share $partner_cleanroom_share_name add accounts = $owner_account_id;

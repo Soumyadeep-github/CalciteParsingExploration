@@ -1,0 +1,7 @@
+#set($role_name=$params.get(0))
+#if(!$role_name.startsWith("NONE"))
+#set($elements = [$role_name, "NONE"])
+#parse("/SnowFlake/commonQueries/Roles&Warehouse.vm")
+#end
+#set($warehouse_name=$params.get(1))
+CREATE WAREHOUSE IF NOT EXISTS $warehouse_name;

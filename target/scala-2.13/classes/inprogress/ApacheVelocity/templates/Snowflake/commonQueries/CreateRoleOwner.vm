@@ -1,0 +1,21 @@
+#set($role_name=$createRoleParams.get(0))
+create or replace role $role_name;
+
+#set($addToShare = ["create:share", "create:database", "create:warehouse", "import:share", "execute:task"])
+
+
+#foreach($ele in $addToShare)
+#set ($i = $ele.split(":"))
+GRANT $i[0].toUpperCase() $i[1].toUpperCase() ON ACCOUNT TO ROLE $role_name;
+#end
+
+-- grant access to specific databases, schemas and tables
+-- TODO : Scale permissions for new datasets
+#if($createRoleParams.size() > 1 && $createRoleParams.get(1))
+#set($dbs_schemas=$createRoleParams.get(1).split(","))
+#parse("/SnowFlake/commonQueries/GrantAccessToOwnerDataset.vm")
+#end
+
+grant role $role_name to role sysadmin;
+
+
