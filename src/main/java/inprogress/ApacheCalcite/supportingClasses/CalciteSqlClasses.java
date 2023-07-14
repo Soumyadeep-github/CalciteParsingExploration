@@ -2,5 +2,12 @@ package inprogress.ApacheCalcite.supportingClasses;
 
 public enum CalciteSqlClasses {
     SqlSelect,
-    SqlJoin
+    SqlJoin,
+    SqlOrderBy,
+    SqlWindow,
+    SqlWith,
+    SqlMerge,
+    SqlAlter,
+    SqlBasicCall,
+    SqlWithItem
 }

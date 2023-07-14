@@ -56,8 +56,25 @@ object ParseSQLQueries extends App {
           println("GET JOIN TYPE " + join.getJoinType)
         case _ =>
           if (call.getOperator.getName.equalsIgnoreCase("unnest")) println("unnest node") else println("null")
+          if (call.getOperator.getName.equalsIgnoreCase("SUM")) println("SUM node") else println("null")
           println(call.getClass)
       }
+      call.getOperator.acceptCall(this, call)
+    }
+  }
+
+  class VisitorSF extends SqlBasicVisitor[Boolean] {
+    def apply(sqlRoot: SqlNode): Boolean = visit(
+      SqlNodeList.of(sqlRoot)
+    )
+
+    override def visit(call: SqlCall): Boolean = {
+      println("------------ INSIDE SqlCall visit ---- ")
+      println("OPERATOR : "+call.getOperator.getKind)
+      println("OPERAND LIST : "+call.getOperandList.stream().filter(x => x!=null).map(x => x.getKind).toArray.mkString(","))
+//      if (call.isInstanceOf[SqlSelect]) {
+//        println("SQL SELECT LIST : " + call.asInstanceOf[SqlSelect].getSelectList)
+//      }
       call.getOperator.acceptCall(this, call)
     }
   }

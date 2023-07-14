@@ -34,7 +34,7 @@ public class CustomSqlVisitor extends SqlBasicVisitor<SqlNode> {
             SqlSelect selectNode = (SqlSelect) call;
             if (kv.containsKey(selectNode.getFrom().toString())) {
                 try {
-                    selectNode.setFrom(generateSqlNodes
+                    selectNode.setFrom(GenerateSqlNodes
                             .getFromOrJoinNode(kv.get(selectNode.getFrom().toString())));
                 } catch (SqlParseException e) {
                     throw new RuntimeException(e);
