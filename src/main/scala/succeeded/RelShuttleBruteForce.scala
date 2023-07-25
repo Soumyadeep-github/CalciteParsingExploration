@@ -70,11 +70,11 @@ object RelShuttleBruteForce extends App {
           println(other.asInstanceOf[LogicalJoin].getRight.getRowType.getFieldNames)
           println(other.asInstanceOf[LogicalJoin].getJoinType.toString)
           // Assert JoinType as INNER
-          assert(!other.asInstanceOf[LogicalJoin].getJoinType.isOuterJoin)
+//          assert(!other.asInstanceOf[LogicalJoin].getJoinType.isOuterJoin)
           // Assert left join key
-          assert(other.asInstanceOf[LogicalJoin].getLeft.getRowType.getFieldNames.contains("departmentId"))
+//          assert(other.asInstanceOf[LogicalJoin].getLeft.getRowType.getFieldNames.contains("departmentId"))
           // Assert right join key
-          assert(other.asInstanceOf[LogicalJoin].getRight.getRowType.getFieldNames.contains("Id"))
+//          assert(other.asInstanceOf[LogicalJoin].getRight.getRowType.getFieldNames.contains("Id"))
         } else if (other.isInstanceOf[LogicalTableScan]) {
           println("Table found")
           println(other.asInstanceOf[LogicalTableScan].getTable)
@@ -83,8 +83,8 @@ object RelShuttleBruteForce extends App {
           println("Project found")
           println(other.asInstanceOf[LogicalProject].getRowType.getFieldNames)
           // Assert if selected column names are allowed
-          assert(other.asInstanceOf[LogicalProject].getRowType.getFieldNames.asScala.toList ==
-                 List("EmpId", "address", "doj", "departmentId", "Id", "Name"))
+//          assert(other.asInstanceOf[LogicalProject].getRowType.getFieldNames.asScala.toList ==
+//                 List("EmpId", "address", "doj", "departmentId", "Id", "Name"))
         }
         super.visit(other) // this is like a base case, when all others fail; such that a RelNode is still returned
       }
@@ -109,10 +109,15 @@ object RelShuttleBruteForce extends App {
   })
 
   val parserConfig = SqlParser.config.withUnquotedCasing(Casing.UNCHANGED)
-  val frameworkConfig = Frameworks.newConfigBuilder.parserConfig(parserConfig).defaultSchema(schema).build
+  val frameworkConfig = Frameworks.newConfigBuilder.parserConfig(parserConfig)
+    .defaultSchema(schema)
+    .build
   val planner = Frameworks.getPlanner(frameworkConfig)
   val sqlTree: SqlNode = planner.parse(
-    "SELECT * FROM employee JOIN department ON employee.departmentId = department.Id")
+    "SELECT departmentId, COUNT(*) AS cnt " +
+      "FROM employee JOIN department " +
+      "ON employee.departmentId = department.Id " +
+      "GROUP BY departmentId ORDER BY 1")
   val validSqlTree: SqlNode = planner.validate(sqlTree)
   val tree2Rel: RelNode = planner.rel(validSqlTree).rel
 

@@ -1,12 +1,11 @@
-package inprogress.ApacheCalcite;
+package succeeded.ApacheCalcite.macroMapping;
 
-import inprogress.ApacheCalcite.supportingClasses.CustomSqlVisitor;
+import succeeded.ApacheCalcite.macroMapping.supportingClasses.CustomSqlVisitor;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.dialect.SnowflakeSqlDialect;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.calcite.sql.parser.SqlParserPos;
-import org.apache.calcite.sql.util.SqlBasicVisitor;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.tools.FrameworkConfig;
 import org.apache.calcite.tools.Frameworks;

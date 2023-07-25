@@ -1,14 +1,12 @@
-package inprogress.ApacheCalcite.supportingClasses;
+package succeeded.ApacheCalcite.macroMapping.supportingClasses;
 
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.util.SqlBasicVisitor;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 

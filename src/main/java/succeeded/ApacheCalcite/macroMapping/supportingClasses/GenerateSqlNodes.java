@@ -1,19 +1,12 @@
-package inprogress.ApacheCalcite.supportingClasses;
+package succeeded.ApacheCalcite.macroMapping.supportingClasses;
 
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.SqlNodeList;
 import org.apache.calcite.sql.SqlSelect;
-import org.apache.calcite.sql.parser.SqlAbstractParserImpl;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParser;
-import org.apache.calcite.sql.parser.SqlParserImplFactory;
-import org.apache.calcite.sql.parser.impl.SqlParserImpl;
-import org.apache.calcite.sql.validate.SqlConformance;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
-import org.codehaus.jackson.map.util.Comparators;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class GenerateSqlNodes {

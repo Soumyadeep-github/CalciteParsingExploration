@@ -1,4 +1,4 @@
-package inprogress.ApacheCalcite.supportingClasses;
+package succeeded.ApacheCalcite.macroMapping.supportingClasses;
 
 public enum CalciteSqlClasses {
     SqlSelect,
