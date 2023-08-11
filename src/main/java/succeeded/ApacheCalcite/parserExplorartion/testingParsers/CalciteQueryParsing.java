@@ -12,8 +12,13 @@ import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.validate.*;
 import org.apache.calcite.tools.FrameworkConfig;
 import org.apache.calcite.tools.Frameworks;
+import org.apache.calcite.tools.Planner;
 import org.apache.calcite.tools.ValidationException;
 import succeeded.ApacheCalcite.parserExplorartion.calcite.SqlVisitorImplementation;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CalciteQueryParsing {
 
@@ -44,7 +49,7 @@ public class CalciteQueryParsing {
         SqlValidator.Config valConf = SqlValidator.Config.DEFAULT;
         FrameworkConfig frameworksConfig = Frameworks.newConfigBuilder()
                 .parserConfig(parserConfig)
-                .defaultSchema(schema)
+//                .defaultSchema(schema)
                 .build();
 
 //        schema.add("tbl1", new AbstractTable() {
@@ -156,11 +161,12 @@ public class CalciteQueryParsing {
                 "FROM census_table " +
                 "GROUP BY 1, 2, 3, 4, 5";
         String query8 = "SELECT country, COUNT(*) AS pop FROM census GROUP BY country";
-        String query9 = "SELECT country, state, COUNT(*) AS pop FROM census GROUP BY 1, state ORDER BY country, state";
+        String query9 = "SELECT country, state, COUNT(*) AS pop FROM census GROUP BY 1, state HAVING COUNT(*) > 120 ORDER BY country, state";
         String query10 = "SELECT DISTINCT(imp.BID_ID) from imp join tra where imp.id = tra.user_id";
         String query11 = "SELECT sha256(SUBSTRING('ABCDEFGHIJKLMNOP', 1, 5)) AS s";
-        String query12 = "SELECT * FROM table1 WHERE a=1 AND b>20 AND C IN (1,2,3,4,5) AND SUBSTRING(a, 1, 3)";
-        SqlNode sqlTree = SqlParser.create(query12, parserConfig).parseQuery();
+        String query12 = "SELECT a,b,c,d FROM table1 WHERE a=1 AND b>20 AND C IN (1,2,3,4,5)";
+        String query13 = "select \"t.@@id\", \"@@id\" from \"@@imp\" as i join \"@@tx\" as t where \"t.@@bid\" = \"i.@@bid\" and \"i.@@email\" = 'abc@gmail.com'";
+        SqlNode sqlTree = SqlParser.create(query13, parserConfig).parseQuery();
 //        SqlNode sqlTree = planner.parse(
 //                "SELECT * FROM movie JOIN hubie ON movie.id = hubie.movie_id GROUP BY movie_id.category_id");
 //        SqlSelect sqlTree1 = (SqlSelect) sqlTree;
@@ -179,21 +185,30 @@ public class CalciteQueryParsing {
         System.out.println("JOIN : "+parsedQueryElements.JOIN);
         System.out.println("COLUMN OPERATIONS : "+parsedQueryElements.COLUMN_OPERATIONS);
         System.out.println("WHERE : "+parsedQueryElements.WHERE);
+        System.out.println("HAVING : "+parsedQueryElements.HAVING);
 //        System.out.println("************************************************************************");
 //        SqlNode sqlTree1 = SqlParser.create(query5, parserConfig).parseQuery();
 //        SqlVisitorImplementation visitor2 = new SqlVisitorImplementation();
 //        visitor2.visit(SqlNodeList.of(sqlTree1));
 //        Map<String, ArrayList<?>> map = new HashMap<>();
-//        System.out.println("SELECT : "+visitor2.getSelect());
 //        Planner planner1 = Frameworks.getPlanner(frameworksConfig);
 //        SqlNode sqlTreeNew = planner1.parse(
 //                "SELECT departmentId, COUNT(*) AS cnt " +
 //                        "FROM employee JOIN department " +
 //                        "ON employee.departmentId = department.Id " +
-//                        "GROUP BY departmentId " +
+//                        "GROUP BY 1 " +
 //                        "ORDER BY 1");
 //        SqlVisitorImplementation visitor3 = new SqlVisitorImplementation();
 //        visitor3.visit(SqlNodeList.of(sqlTreeNew));
+//        ParsedQueryElements parsedQueryElements3 = visitor3.getParsedQueryElements();
+//        System.out.println("SELECT : "+parsedQueryElements3.SELECT);
+//        System.out.println("GROUP BY : "+parsedQueryElements3.GROUP_BY);
+//        System.out.println("FROM : "+parsedQueryElements3.FROM);
+//        System.out.println("ORDER BY : "+parsedQueryElements3.ORDER_BY);
+//        System.out.println("JOIN : "+parsedQueryElements3.JOIN);
+//        System.out.println("COLUMN OPERATIONS : "+parsedQueryElements3.COLUMN_OPERATIONS);
+//        System.out.println("WHERE : "+parsedQueryElements3.WHERE);
+//        System.out.println("HAVING : "+parsedQueryElements3.HAVING);
 //        System.out.println("SELECT : "+custVisitor.getSelect());
 
 //        System.out.println(((SqlOrderBy) (SqlCall) sqlTreeNew).orderList);

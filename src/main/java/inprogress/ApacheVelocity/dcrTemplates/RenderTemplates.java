@@ -4,15 +4,9 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 
 import java.util.HashMap;
@@ -100,7 +94,7 @@ public class RenderTemplates {
 
     /* TODO : ADD tables on partner side
     * */
-    public static String onboardDatasetQueries(OnboarDatasetDTO onboardDatasetDto) {
+    public static String onboardDatasetQueries(OnboardDatasetDTO onboardDatasetDto) {
         String templateName;
         if (onboardDatasetDto.getIsOwner()) {
             templateName = "4.OnboardDatasetOwner.vm";
@@ -241,29 +235,38 @@ public class RenderTemplates {
         return parseTemplate(templateName, templatePlaceHolders);
     }
 
+    public static String testDollar() {
+        String templateName = "test.vm";
+        templatePlaceHolders = new HashMap<>();
+        templatePlaceHolders.put("num", "20");
+        templatePlaceHolders.put("wait", "----");
+        return parseTemplate(templateName, templatePlaceHolders);
+    }
+
 
 
     public static void main(String[] args) {
-        System.out.println("-- STEP 1");
-        System.out.println("/************* CREATE COLLABORATION *****************/");
-        System.out.println(createCollaborationQueries());
-        System.out.println("-- STEP 2");
-        System.out.println("/************* INVITE PARTNER *****************/");
-        System.out.println(invitePartnerQueries()+"\n");
-        System.out.println("-- STEP 3");
-        System.out.println("/************* ACCEPT INVITE *****************/");
-        System.out.println(acceptInviteQueries());
-        System.out.println("-- STEP 4");
-        System.out.println("/************* ONBOARD OWNER DATASETS *****************/");
-        OnboarDatasetDTO onboardDatasetDtoT = new OnboarDatasetDTO(true);
-        System.out.println(onboardDatasetQueries(onboardDatasetDtoT));
-        System.out.println("-- STEP 5");
-        System.out.println("/************* ONBOARD PARTNER DATASETS *****************/");
-        OnboarDatasetDTO onboardDatasetDtoF = new OnboarDatasetDTO(false);
-        System.out.println(onboardDatasetQueries(onboardDatasetDtoF));
-        System.out.println("-- STEP 7");
-        System.out.println("/************* Question Instance Execution *****************/");
-        System.out.println(questionInstanceExecution());
+        System.out.print(testDollar());
+//        System.out.println("-- STEP 1");
+//        System.out.println("/************* CREATE COLLABORATION *****************/");
+//        System.out.println(createCollaborationQueries());
+//        System.out.println("-- STEP 2");
+//        System.out.println("/************* INVITE PARTNER *****************/");
+//        System.out.println(invitePartnerQueries()+"\n");
+//        System.out.println("-- STEP 3");
+//        System.out.println("/************* ACCEPT INVITE *****************/");
+//        System.out.println(acceptInviteQueries());
+//        System.out.println("-- STEP 4");
+//        System.out.println("/************* ONBOARD OWNER DATASETS *****************/");
+//        OnboardDatasetDTO onboardDatasetDtoT = new OnboardDatasetDTO(true);
+//        System.out.println(onboardDatasetQueries(onboardDatasetDtoT));
+//        System.out.println("-- STEP 5");
+//        System.out.println("/************* ONBOARD PARTNER DATASETS *****************/");
+//        OnboardDatasetDTO onboardDatasetDtoF = new OnboardDatasetDTO(false);
+//        System.out.println(onboardDatasetQueries(onboardDatasetDtoF));
+//        System.out.println("-- STEP 7");
+//        System.out.println("/************* Question Instance Execution *****************/");
+//        System.out.println(questionInstanceExecution());
     }
 
 }

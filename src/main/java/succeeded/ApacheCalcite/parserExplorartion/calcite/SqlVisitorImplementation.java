@@ -202,7 +202,7 @@ public class SqlVisitorImplementation extends SqlBasicVisitor<SqlNode> {
                     selectKeyWordStructure.isAlias = true;
                 } else selectKeyWordStructure.isAlias = false;
                 if (!basicCall.getKind().belongsTo(Set.of(SqlKind.AND, SqlKind.OR, SqlKind.NOT))) {
-                    selectKeyWordStructure.columnName = basicCall.getOperandList().get(0).toString();
+                    if (!Objects.equals(basicCall.operand(0).toString(), "*")) selectKeyWordStructure.columnName = basicCall.operand(0).toString();
                 }
                 Set<SqlKind> comparators = new HashSet<>(Arrays.asList(
                         SqlKind.GREATER_THAN,
@@ -229,7 +229,6 @@ public class SqlVisitorImplementation extends SqlBasicVisitor<SqlNode> {
                 if (basicCall.getOperator() != null) System.out.println(basicCall.getOperator() instanceof SqlOperator);
                 System.out.println(basicCall.operand(0));
                 System.out.println(basicCall.getOperandList());
-                System.out.println();
                 parsedQueryElements.COLUMN_OPERATIONS.add(selectKeyWordStructure);
                 return basicCall;
             default:
