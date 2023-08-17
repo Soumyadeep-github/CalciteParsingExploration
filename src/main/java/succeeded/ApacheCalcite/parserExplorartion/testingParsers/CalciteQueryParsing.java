@@ -15,6 +15,7 @@ import org.apache.calcite.tools.Frameworks;
 import org.apache.calcite.tools.Planner;
 import org.apache.calcite.tools.ValidationException;
 import succeeded.ApacheCalcite.parserExplorartion.calcite.SqlVisitorImplementation;
+import succeeded.ApacheCalcite.parserExplorartion.calcite.SqlVisitorImplementation2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -164,13 +165,13 @@ public class CalciteQueryParsing {
         String query9 = "SELECT country, state, COUNT(*) AS pop FROM census GROUP BY 1, state HAVING COUNT(*) > 120 ORDER BY country, state";
         String query10 = "SELECT DISTINCT(imp.BID_ID) from imp join tra where imp.id = tra.user_id";
         String query11 = "SELECT sha256(SUBSTRING('ABCDEFGHIJKLMNOP', 1, 5)) AS s";
-        String query12 = "SELECT a,b,c,d FROM table1 WHERE a=1 AND b>20 AND C IN (1,2,3,4,5)";
+        String query12 = "SELECT a,b,c,d FROM table1 as t1 WHERE a=1 AND b>20 AND C IN (1,2,3,4,5)";
         String query13 = "select \"t.@@id\", \"@@id\" from \"@@imp\" as i join \"@@tx\" as t where \"t.@@bid\" = \"i.@@bid\" and \"i.@@email\" = 'abc@gmail.com'";
         SqlNode sqlTree = SqlParser.create(query13, parserConfig).parseQuery();
 //        SqlNode sqlTree = planner.parse(
 //                "SELECT * FROM movie JOIN hubie ON movie.id = hubie.movie_id GROUP BY movie_id.category_id");
 //        SqlSelect sqlTree1 = (SqlSelect) sqlTree;
-        SqlVisitorImplementation custVisitor = new SqlVisitorImplementation();
+        SqlVisitorImplementation2 custVisitor = new SqlVisitorImplementation2();
         custVisitor.visit(SqlNodeList.of(sqlTree));
         ParsedQueryElements parsedQueryElements = custVisitor.getParsedQueryElements();
         System.out.println("************************************************************************");

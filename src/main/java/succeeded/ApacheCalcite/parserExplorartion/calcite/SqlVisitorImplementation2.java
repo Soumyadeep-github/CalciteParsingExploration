@@ -1,6 +1,6 @@
 package succeeded.ApacheCalcite.parserExplorartion.calcite;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import succeeded.ApacheCalcite.macroMapping.supportingClasses.CalciteSqlClasses;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.SqlFunction;
@@ -9,10 +9,11 @@ import succeeded.ApacheCalcite.parserExplorartion.testingParsers.ParsedQueryElem
 import succeeded.ApacheCalcite.parserExplorartion.testingParsers.SelectKeyWordStructure;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class SqlVisitorImplementation extends SqlBasicVisitor<SqlNode> {
+public class SqlVisitorImplementation2 extends SqlBasicVisitor<SqlNode> {
 
-//    private List<String> columns;
+    //    private List<String> columns;
 //
 //    private Map<String, String> kv;
 //
@@ -23,7 +24,7 @@ public class SqlVisitorImplementation extends SqlBasicVisitor<SqlNode> {
 //        this.kv = keyValues;
 //    }
 
-    public SqlVisitorImplementation() {}
+    public SqlVisitorImplementation2() {}
 
     private final ParsedQueryElements parsedQueryElements = new ParsedQueryElements();
 
@@ -32,9 +33,112 @@ public class SqlVisitorImplementation extends SqlBasicVisitor<SqlNode> {
         return parsedQueryElements;
     }
 
-    public void parseSqlJoin(ParsedQueryElements pql, SqlNode node) {
-        SqlJoin join = (SqlJoin) node;
+    public void parseJoin(SqlCall call) {
+        SqlJoin join = (SqlJoin) call;
+        Map<String, String> map = new HashMap<>();
+        map.put("JOIN_TYPE", join.getJoinType().toString());
+        if(join.getCondition() != null) map.put("CONDITION", join.getCondition().toString());
+        if (!join.getLeft().getKind().equals(SqlKind.JOIN)) {
+            System.out.println("KIND LEFT : "+join.getLeft().getKind());
+            if (join.getLeft() instanceof SqlSelect) {
+//                System.out.println("REACH");
+                SqlSelect leftNode = ((SqlSelect) join.getLeft());
+                if (leftNode.getFrom() != null) map.put("LEFT_TBL_NAME", leftNode.getFrom().toString());
+            } else if (join.getLeft() instanceof SqlBasicCall) {
+                List<String> left = parseBasicCallForTable(join.getLeft(), "JOIN");
+                map.put("LEFT_TBL_NAME", left.get(0));
+                if (left.size() > 1) map.put("LEFT_TBL_ALIAS", left.get(1));
+            }
+        }
+        if (!join.getRight().getKind().equals(SqlKind.JOIN)) {
+            if (join.getRight() instanceof SqlSelect) {
+                SqlSelect rightNode = ((SqlSelect) join.getRight());
+                if (rightNode.getFrom() != null) map.put("RIGHT_TBL_NAME", rightNode.getFrom().toString());
+            } else if (join.getRight() instanceof SqlBasicCall) {
+                List<String> right = parseBasicCallForTable(join.getRight(), "JOIN");
+                map.put("RIGHT_TBL_NAME", right.get(0));
+                if (right.size() > 1) map.put("RIGHT_TBL_ALIAS", right.get(1));
+            }
+        }
 
+//                if (!join.getLeft().getKind().equals(SqlKind.JOIN)) {
+//                    System.out.println("HEY");
+//                    if (join.getLeft() instanceof SqlSelect) {
+//                    SqlBasicCall leftNode = (SqlBasicCall) join.getLeft();
+////                    System.out.println("L N contents: "+leftNode.getOperator());
+//                        if (leftNode.getFrom() != null) map.put("LEFT_TBL_NAME", leftNode.getFrom().toString());
+//                    }
+//                }
+//                if (!join.getRight().getKind().equals(SqlKind.JOIN)) {
+//                    System.out.println("HEY 1");
+////                    if (join.getRight() instanceof SqlSelect) {
+//                    SqlSelect rightNode = ((SqlSelect) join.getRight());
+//                    if (rightNode.getFrom() != null) map.put("RIGHT_TBL_NAME", rightNode.getFrom().toString());
+////                    }
+//                }
+        if (!join.getLeft().getKind().equals(SqlKind.JOIN) ||
+                !join.getRight().getKind().equals(SqlKind.JOIN)) {
+            call.getOperator().acceptCall(this, call);
+        }
+        System.out.println(map);
+        parsedQueryElements.JOIN.add(map);
+    }
+
+    public void parseSelect(SqlCall call) {
+        SqlSelect select = (SqlSelect) call;
+        assert select.getFrom() != null;
+        if (select.getFrom().getKind().equals(SqlKind.JOIN)) {
+//            SqlJoin call1 = (SqlJoin) select.getFrom();
+//            System.out.println(" INSTANCE : " + call1);
+            parseJoin((SqlCall) select.getFrom());
+        } else {
+            parseBasicCallForTable(select.getFrom(), "SELECT");
+//            if (!parsedQueryElements.FROM.contains(select.getFrom())) parsedQueryElements.FROM.add(select.getFrom());
+        }
+        if (select.getWhere() != null) {
+            parsedQueryElements.WHERE.add(select.getWhere());
+        }
+        if (select.getHaving() != null) {
+            parsedQueryElements.HAVING.add(select.getHaving());
+        }
+
+        if (select.getGroup() != null) {
+            select.getGroup().getList()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .forEach(
+                            x -> {
+                                if (x.getKind() == SqlKind.LITERAL) {
+                                    parsedQueryElements.GROUP_BY.add(select.getSelectList()
+                                            .getList()
+                                            .get(Integer.parseInt(x.toString()) - 1)
+                                    );
+                                } else parsedQueryElements.GROUP_BY.add(x);
+                            }
+                    );
+        }
+        if (select.getOrderList() != null) {
+            select.getOrderList().getList().forEach(x -> {if (x != null && !parsedQueryElements.ORDER_BY.contains(x)) parsedQueryElements.ORDER_BY.add(x);});
+        }
+        if (select.getSelectList() != null) {
+            select.getSelectList().getList().forEach(x -> {if (x != null && !parsedQueryElements.SELECT.contains(x)) parsedQueryElements.SELECT.add(x);});
+        }
+    }
+
+//    public Map<String, String> parseBasicCallForJoin() {
+//
+//    }
+
+    public List<String> parseBasicCallForTable(SqlNode node, @NonNull String source) {
+        SqlBasicCall basicCall = (SqlBasicCall) node;
+        switch (source) {
+            case "JOIN":
+            case "SELECT":
+                parsedQueryElements.FROM.add(basicCall.operand(0));
+                return basicCall.getOperandList().stream().map(SqlNode::toString).collect(Collectors.toList());
+            default:
+                return null;
+        }
     }
 
 
@@ -46,93 +150,13 @@ public class SqlVisitorImplementation extends SqlBasicVisitor<SqlNode> {
             case SqlSelect:
                 i += 1;
                 System.out.println("-------------------- SqlSelect -------------------");
-//                System.out.println("BASIC CALL OR NOT : "+((SqlBasicCall) call));
-                SqlSelect select = (SqlSelect) call;
-                System.out.println("I : "+i);
-//                System.out.println("FROM : "+select.getFrom().getKind());
-                assert select.getFrom() != null;
-                if (select.getFrom().getKind().equals(SqlKind.JOIN)) {
-                    boolean a = select.getFrom() instanceof SqlJoin;
-                    System.out.println("FROM : "+a);
-                    if (!parsedQueryElements.FROM.contains(select.getFrom())) parsedQueryElements.FROM.add(select.getFrom());
-                }
-//                System.out.println("WHERE : "+select.getWhere());
-                if (select.getWhere() != null) {
-//                    System.out.println("WHERE KIND : " +select.getWhere().getKind());
-                    parsedQueryElements.WHERE.add(select.getWhere());
-                }
-                if (select.getHaving() != null) {
-//                    System.out.println("HAVING KIND : " +select.getHaving().getKind());
-                    parsedQueryElements.HAVING.add(select.getHaving());
-                }
-
-                if (select.getGroup() != null) {
-                    select.getGroup().getList()
-                            .stream()
-                            .filter(Objects::nonNull)
-                            .forEach(
-                            x -> {
-                                if (x.getKind() == SqlKind.LITERAL) {
-                                    parsedQueryElements.GROUP_BY.add(select.getSelectList()
-                                            .getList()
-                                            .get(Integer.parseInt(x.toString()) - 1)
-                                    );
-                                } else parsedQueryElements.GROUP_BY.add(x);
-                            }
-                    );
-                }
-//                System.out.println("GROUP : "+select.getGroup());
-//                System.out.println("ORDER LIST : "+select.getOrderList());
-//                System.out.println("WINDOW LIST : "+select.getWindowList());
-//                System.out.println("OPERATOR : "+select.getOperator());
-//                System.out.println("KIND : "+select.getKind());
-//                System.out.println("HINTS : "+select.getHints());
-                if (select.getOrderList() != null) {
-                    System.out.println("ORDER BY : "+select.getOrderList());
-                    select.getOrderList().getList().forEach(x -> {if (x != null && !parsedQueryElements.ORDER_BY.contains(x)) parsedQueryElements.ORDER_BY.add(x);});
-                }
-                if (select.getSelectList() != null) {
-//                    System.out.println("SELECT LIST : "+select.getSelectList());
-//                    ArrayList<SqlNode> s = select.getSelectList().getList().stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
-                    select.getSelectList().getList().forEach(x -> {if (x != null && !parsedQueryElements.SELECT.contains(x)) parsedQueryElements.SELECT.add(x);});
-                }
-                return select;
+                parseSelect(call);
+                return call;
             case SqlJoin:
                 i += 1;
                 System.out.println("-------------------- SqlJoin -------------------");
-                Map<String, String> map = new HashMap<>();
-                SqlJoin join = (SqlJoin) call;
-//                boolean a = join.getLeft() instanceof SqlSelect;
-                System.out.println("JOIN L: "+join.getLeft());
-                System.out.println("I : "+i);
-                map.put("JOIN_TYPE", join.getJoinType().toString());
-                if(join.getCondition() != null) map.put("CONDITION", join.getCondition().toString());
-//                System.out.println("CONDITION : "+join.getCondition());
-//                System.out.println("JOIN TYPE : "+join.getJoinType());
-//                System.out.println("JOIN OPERATOR : "+join.getOperator());
-//                System.out.println("LEFT : "+join.getLeft());
-//                System.out.println("RIGHT : "+join.getRight());
-                if (!join.getLeft().getKind().equals(SqlKind.JOIN)) {
-                    if (join.getLeft() instanceof SqlSelect) {
-                        SqlSelect leftNode = ((SqlSelect) join.getLeft());
-                        if (leftNode.getFrom() != null) map.put("LEFT_TBL_NAME", leftNode.getFrom().toString());
-                    }
-                }
-                if (!join.getRight().getKind().equals(SqlKind.JOIN)) {
-                    if (join.getRight() instanceof SqlSelect) {
-                        SqlSelect rightNode = ((SqlSelect) join.getRight());
-                        if (rightNode.getFrom() != null) map.put("RIGHT_TBL_NAME", rightNode.getFrom().toString());
-                    }
-                }
-                if (!join.getLeft().getKind().equals(SqlKind.JOIN) ||
-                    !join.getRight().getKind().equals(SqlKind.JOIN)) {
-                    call.getOperator().acceptCall(this, call);
-                }
-//                System.out.println("LEFT : "+join.getLeft().getKind());
-//                System.out.println("RIGHT : "+join.getRight().getKind());
-//                System.out.println("CONDITION TYPE : "+join.getConditionType());
-                parsedQueryElements.JOIN.add(map);
-                return join;
+                parseJoin(call);
+                return call;
             case SqlOrderBy:
                 i += 1;
                 System.out.println("-------------------- SqlOrderBy -------------------");
@@ -214,7 +238,7 @@ public class SqlVisitorImplementation extends SqlBasicVisitor<SqlNode> {
                 System.out.println("I : "+i);
                 SqlBasicCall basicCall = (SqlBasicCall) call;
                 if (basicCall.getKind() == SqlKind.AS) {
-                    selectKeyWordStructure.alias = basicCall.getOperandList().get(1).toString();
+                    selectKeyWordStructure.alias = basicCall.operand(1).toString();
                     selectKeyWordStructure.isAlias = true;
                 } else selectKeyWordStructure.isAlias = false;
                 if (!basicCall.getKind().belongsTo(Set.of(SqlKind.AND, SqlKind.OR, SqlKind.NOT))) {
@@ -242,9 +266,9 @@ public class SqlVisitorImplementation extends SqlBasicVisitor<SqlNode> {
                 selectKeyWordStructure.sqlFunctionOrOperator = basicCall.getOperator().getName();
                 basicCall.getOperandList().forEach(x -> selectKeyWordStructure.sqlFunctionOperators.add(x.toString()));
                 System.out.println(basicCall.getKind());
-                if (basicCall.getOperator() != null) System.out.println(basicCall.getOperator() instanceof SqlOperator);
-                System.out.println(basicCall.operand(0));
-                System.out.println(basicCall.getOperandList());
+//                if (basicCall.getOperator() != null) System.out.println(basicCall.getOperator() instanceof SqlOperator);
+//                System.out.println(basicCall.operand(0));
+//                System.out.println(basicCall.getOperandList());
                 parsedQueryElements.COLUMN_OPERATIONS.add(selectKeyWordStructure);
                 return basicCall;
             default:
